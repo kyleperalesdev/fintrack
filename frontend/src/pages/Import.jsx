@@ -154,39 +154,39 @@ function StepUpload({ onParsed }) {
 function StepMapCategories({ parseResult, mappings, setMappings, onNext, onBack }) {
   const { mappingSuggestions, defaultCategories } = parseResult
   const allKeys = Object.keys(mappingSuggestions)
-  const [newCategoryInputs, setNewCategoryInputs] = useState({})
+
+  // Unmatched categories start in "create new" mode with the csv name pre-filled
+  const [newCategoryInputs, setNewCategoryInputs] = useState(() => {
+    const init = {}
+    allKeys.forEach(k => {
+      if (mappingSuggestions[k].isNew) {
+        init[k] = mappings[k] || mappingSuggestions[k].csvCategory
+      }
+    })
+    return init
+  })
 
   const setMapping = (key, value) => setMappings(m => ({ ...m, [key]: value }))
 
   const handleSelectChange = (key, value) => {
     if (value === '__new__') {
-      setNewCategoryInputs(n => ({ ...n, [key]: mappingSuggestions[key].csvCategory }))
-      setMapping(key, '')
+      const defaults = defaultCategories[mappingSuggestions[key].type]
+      const cur = mappings[key]
+      const initialName = (cur && !defaults.includes(cur)) ? cur : mappingSuggestions[key].csvCategory
+      setNewCategoryInputs(n => ({ ...n, [key]: initialName }))
+      setMapping(key, initialName)
     } else {
       setNewCategoryInputs(n => { const c = { ...n }; delete c[key]; return c })
       setMapping(key, value)
     }
   }
 
-  // Pre-fill suggestions on first render
-  useEffect(() => {
-    const updates = {}
-    allKeys.forEach(k => {
-      if (!mappings[k]) {
-        const { suggestedMatch, csvCategory } = mappingSuggestions[k]
-        updates[k] = suggestedMatch || csvCategory
-      }
-    })
-    if (Object.keys(updates).length) {
-      setMappings(m => ({ ...m, ...updates }))
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const canProceed = allKeys.every(key => {
+  const unmappedKeys = allKeys.filter(key => {
     const val = mappings[key]
-    return val && val.trim()
+    return !val || !val.trim()
   })
+
+  const canProceed = unmappedKeys.length === 0
 
   if (allKeys.length === 0) {
     return (
@@ -222,13 +222,18 @@ function StepMapCategories({ parseResult, mappings, setMappings, onNext, onBack 
         </div>
         <div className="space-y-3">
           {keys.map(key => {
-            const { csvCategory, isNew } = mappingSuggestions[key]
+            const { csvCategory } = mappingSuggestions[key]
             const currentMapping = mappings[key] || ''
             const isCreatingNew = key in newCategoryInputs
-            const isCustom = currentMapping && !defaults.includes(currentMapping)
+            const isEmpty = !currentMapping.trim()
+            const isCustomNew = !isEmpty && !defaults.includes(currentMapping)
 
             return (
-              <div key={key} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/40 border border-gray-100 dark:border-gray-600">
+              <div key={key} className={`flex items-center gap-3 p-3 rounded-lg border ${
+                isEmpty
+                  ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
+                  : 'bg-gray-50 dark:bg-gray-700/40 border-gray-100 dark:border-gray-600'
+              }`}>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{csvCategory}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">from CSV</p>
@@ -246,11 +251,10 @@ function StepMapCategories({ parseResult, mappings, setMappings, onNext, onBack 
                       }}
                       placeholder="New category name..."
                       className={`${inputCls} w-full`}
-                      autoFocus
                     />
                   ) : (
                     <select
-                      value={isCustom ? '__new__' : currentMapping}
+                      value={isCustomNew ? '__new__' : currentMapping}
                       onChange={e => handleSelectChange(key, e.target.value)}
                       className={`${inputCls} w-full`}
                     >
@@ -263,7 +267,8 @@ function StepMapCategories({ parseResult, mappings, setMappings, onNext, onBack 
                     <button
                       onClick={() => {
                         setNewCategoryInputs(n => { const c = { ...n }; delete c[key]; return c })
-                        setMapping(key, mappingSuggestions[key].suggestedMatch || '')
+                        const fallback = mappingSuggestions[key].suggestedMatch || ''
+                        setMapping(key, fallback)
                       }}
                       className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 mt-1 block"
                     >
@@ -271,10 +276,10 @@ function StepMapCategories({ parseResult, mappings, setMappings, onNext, onBack 
                     </button>
                   )}
                 </div>
-                {!isCreatingNew && isNew && !isCustom && (
-                  <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full shrink-0">unmatched</span>
+                {isEmpty && (
+                  <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full shrink-0">needs mapping</span>
                 )}
-                {isCreatingNew && (
+                {!isEmpty && isCustomNew && (
                   <span className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 px-2 py-0.5 rounded-full shrink-0">new</span>
                 )}
               </div>
@@ -299,9 +304,16 @@ function StepMapCategories({ parseResult, mappings, setMappings, onNext, onBack 
         {renderGroup(expenseKeys, 'expense')}
       </div>
 
-      {!canProceed && (
+      {!canProceed && unmappedKeys.length > 0 && (
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
-          All categories must be mapped before proceeding.
+          <p className="font-medium mb-1">
+            {unmappedKeys.length} categor{unmappedKeys.length === 1 ? 'y needs' : 'ies need'} mapping before proceeding:
+          </p>
+          <ul className="list-disc list-inside space-y-0.5">
+            {unmappedKeys.map(k => (
+              <li key={k}>{mappingSuggestions[k].csvCategory} ({mappingSuggestions[k].type})</li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -616,7 +628,12 @@ export default function Import() {
   const handleParsed = (result, name) => {
     setParseResult(result)
     setFileName(name)
-    setMappings({})
+    // Pre-compute mappings synchronously so step 2 renders with values already set
+    const initial = {}
+    Object.entries(result.mappingSuggestions).forEach(([key, s]) => {
+      initial[key] = s.suggestedMatch || s.csvCategory
+    })
+    setMappings(initial)
     setStep(1)
   }
 
