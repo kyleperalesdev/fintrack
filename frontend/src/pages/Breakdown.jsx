@@ -64,7 +64,7 @@ export default function Breakdown() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Breakdown</h1>
         <div className="flex gap-2 items-center">
           <input type="date" value={range.from} onChange={e => setRange(r => ({ ...r, from: e.target.value }))} className={dateCls} />
@@ -74,22 +74,22 @@ export default function Breakdown() {
       </div>
 
       {/* Totals */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-          <p className="text-xs text-green-600 dark:text-green-400 font-medium uppercase tracking-wide">Total Income</p>
-          <p className="text-2xl font-bold text-green-700 dark:text-green-400 mt-1">{fmt(income)}</p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 sm:p-4">
+          <p className="text-xs text-green-600 dark:text-green-400 font-medium uppercase tracking-wide">Income</p>
+          <p className="text-lg sm:text-2xl font-bold text-green-700 dark:text-green-400 mt-1 truncate">{fmt(income)}</p>
         </div>
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-          <p className="text-xs text-red-600 dark:text-red-400 font-medium uppercase tracking-wide">Total Expenses</p>
-          <p className="text-2xl font-bold text-red-700 dark:text-red-400 mt-1">{fmt(expense)}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 sm:p-4">
+          <p className="text-xs text-red-600 dark:text-red-400 font-medium uppercase tracking-wide">Expenses</p>
+          <p className="text-lg sm:text-2xl font-bold text-red-700 dark:text-red-400 mt-1 truncate">{fmt(expense)}</p>
         </div>
-        <div className={`border rounded-xl p-4 ${
+        <div className={`border rounded-xl p-3 sm:p-4 ${
           net >= 0
             ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
             : 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
         }`}>
           <p className={`text-xs font-medium uppercase tracking-wide ${net >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>Net</p>
-          <p className={`text-2xl font-bold mt-1 ${net >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-orange-700 dark:text-orange-400'}`}>{fmt(net)}</p>
+          <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${net >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-orange-700 dark:text-orange-400'}`}>{fmt(net)}</p>
         </div>
       </div>
 
@@ -108,7 +108,7 @@ export default function Breakdown() {
           <p className="text-sm">No {tab} data for this period.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Pie Chart */}
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <ResponsiveContainer width="100%" height={260}>

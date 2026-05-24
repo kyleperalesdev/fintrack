@@ -55,7 +55,7 @@ function StepUpload({ onParsed }) {
       </div>
 
       {/* File format guide */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="rounded-lg border border-gray-200 dark:border-gray-600 p-4 bg-gray-50 dark:bg-gray-700/50">
           <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2">Setup Sheet</p>
           <table className="text-xs w-full">
@@ -110,7 +110,7 @@ function StepUpload({ onParsed }) {
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${
+        className={`border-2 border-dashed rounded-xl p-6 sm:p-10 text-center cursor-pointer transition-colors ${
           dragging
             ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
             : 'border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
@@ -645,10 +645,10 @@ export default function Import() {
       </div>
 
       {/* Step indicator */}
-      <div className="flex items-center gap-0">
+      <div className="flex items-center">
         {STEPS.map((label, i) => (
           <div key={i} className="flex items-center flex-1 last:flex-none">
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                 i < step
                   ? 'bg-indigo-600 text-white'
@@ -658,7 +658,7 @@ export default function Import() {
               }`}>
                 {i < step ? '✓' : i + 1}
               </div>
-              <span className={`text-sm font-medium ${
+              <span className={`hidden sm:inline text-sm font-medium ${
                 i === step
                   ? 'text-indigo-600 dark:text-indigo-400'
                   : i < step
@@ -669,7 +669,7 @@ export default function Import() {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`flex-1 h-0.5 mx-3 transition-colors ${
+              <div className={`flex-1 h-0.5 mx-2 sm:mx-3 transition-colors ${
                 i < step ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
               }`} />
             )}

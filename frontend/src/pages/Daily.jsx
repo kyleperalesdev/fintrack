@@ -45,7 +45,7 @@ export default function Daily() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Daily Entries</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">{dateLabel}</p>
@@ -59,7 +59,7 @@ export default function Daily() {
           />
           <button
             onClick={() => setShowForm(f => !f)}
-            className="px-4 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700"
+            className="px-4 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 whitespace-nowrap"
           >
             {showForm ? 'Cancel' : '+ Add Entry'}
           </button>
@@ -67,22 +67,22 @@ export default function Daily() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 sm:p-4">
           <p className="text-xs text-green-600 dark:text-green-400 font-medium uppercase tracking-wide">Income</p>
-          <p className="text-2xl font-bold text-green-700 dark:text-green-400 mt-1">{fmt(income)}</p>
+          <p className="text-lg sm:text-2xl font-bold text-green-700 dark:text-green-400 mt-1 truncate">{fmt(income)}</p>
         </div>
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 sm:p-4">
           <p className="text-xs text-red-600 dark:text-red-400 font-medium uppercase tracking-wide">Expenses</p>
-          <p className="text-2xl font-bold text-red-700 dark:text-red-400 mt-1">{fmt(expense)}</p>
+          <p className="text-lg sm:text-2xl font-bold text-red-700 dark:text-red-400 mt-1 truncate">{fmt(expense)}</p>
         </div>
-        <div className={`border rounded-xl p-4 ${
+        <div className={`border rounded-xl p-3 sm:p-4 ${
           net >= 0
             ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
             : 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
         }`}>
           <p className={`text-xs font-medium uppercase tracking-wide ${net >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>Net</p>
-          <p className={`text-2xl font-bold mt-1 ${net >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-orange-700 dark:text-orange-400'}`}>
+          <p className={`text-lg sm:text-2xl font-bold mt-1 truncate ${net >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-orange-700 dark:text-orange-400'}`}>
             {net < 0 ? '-' : ''}{fmt(net)}
           </p>
         </div>

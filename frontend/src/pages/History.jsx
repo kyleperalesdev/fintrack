@@ -55,7 +55,7 @@ export default function History() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">History</h1>
           {entries.length > 0 && (
@@ -64,15 +64,19 @@ export default function History() {
             </p>
           )}
         </div>
-        <div className="flex gap-2 items-center flex-wrap">
-          {['all', 'income', 'expense'].map(f => (
-            <button key={f} onClick={() => setFilter(f)} className={filterBtnCls(filter === f)}>
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
-          <input type="date" value={range.from} onChange={e => setRange(r => ({ ...r, from: e.target.value }))} className={dateCls} />
-          <span className="text-gray-400 dark:text-gray-500 text-sm">to</span>
-          <input type="date" value={range.to} onChange={e => setRange(r => ({ ...r, to: e.target.value }))} className={dateCls} />
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+          <div className="flex gap-2">
+            {['all', 'income', 'expense'].map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={filterBtnCls(filter === f)}>
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 items-center">
+            <input type="date" value={range.from} onChange={e => setRange(r => ({ ...r, from: e.target.value }))} className={dateCls} />
+            <span className="text-gray-400 dark:text-gray-500 text-sm">to</span>
+            <input type="date" value={range.to} onChange={e => setRange(r => ({ ...r, to: e.target.value }))} className={dateCls} />
+          </div>
         </div>
       </div>
 

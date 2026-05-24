@@ -30,7 +30,7 @@ export default function EntryForm({ onSubmit, initial = {}, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Date</label>
           <input
@@ -63,7 +63,7 @@ export default function EntryForm({ onSubmit, initial = {}, onCancel }) {
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Category</label>
           <select
@@ -76,7 +76,7 @@ export default function EntryForm({ onSubmit, initial = {}, onCancel }) {
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        <div className="w-40">
+        <div className="w-full sm:w-40">
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Amount (₱)</label>
           <input
             type="number"

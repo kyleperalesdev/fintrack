@@ -13,7 +13,7 @@ function AppShell() {
     <div className={dark ? 'dark' : ''}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
         <Navigation />
-        <main className="max-w-5xl mx-auto px-4 py-6">
+        <main className="max-w-5xl mx-auto px-4 py-4 sm:py-6 pb-20 md:pb-6">
           <Routes>
             <Route path="/" element={<Navigate to="/daily" replace />} />
             <Route path="/daily" element={<Daily />} />

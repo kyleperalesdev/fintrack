@@ -87,7 +87,7 @@ export default function Observations() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Observations</h1>
         <div className="flex gap-2 items-center">
           <input type="date" value={range.from} onChange={e => setRange(r => ({ ...r, from: e.target.value }))} className={dateCls} />
@@ -109,20 +109,20 @@ export default function Observations() {
               ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
               : 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
           }`}>
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex items-start justify-between mb-4 gap-3">
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Savings Rate</p>
-                <p className={`text-5xl font-bold mt-1 ${aboveTarget ? 'text-green-700 dark:text-green-400' : 'text-orange-700 dark:text-orange-400'}`}>
+                <p className={`text-4xl sm:text-5xl font-bold mt-1 ${aboveTarget ? 'text-green-700 dark:text-green-400' : 'text-orange-700 dark:text-orange-400'}`}>
                   {income === 0 ? 'N/A' : `${savingsRate.toFixed(1)}%`}
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <p className="text-sm text-gray-500 dark:text-gray-400">Target: <strong>{SAVINGS_TARGET}%</strong></p>
                 {income > 0 && (
                   <p className={`text-sm font-semibold mt-1 ${aboveTarget ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
                     {aboveTarget
-                      ? `${(savingsRate - SAVINGS_TARGET).toFixed(1)}% above target`
-                      : `${(SAVINGS_TARGET - savingsRate).toFixed(1)}% below target`}
+                      ? `${(savingsRate - SAVINGS_TARGET).toFixed(1)}% above`
+                      : `${(SAVINGS_TARGET - savingsRate).toFixed(1)}% below`}
                   </p>
                 )}
               </div>
@@ -145,7 +145,7 @@ export default function Observations() {
           </div>
 
           {/* Net Savings + Daily Average */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-2">Net Savings</p>
               <p className={`text-2xl font-bold ${net >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}`}>{fmt(net)}</p>
@@ -201,7 +201,7 @@ export default function Observations() {
                 <BarChart data={expenseCats} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} horizontal={false} />
                   <XAxis type="number" tick={{ fontSize: 11, fill: chartTick }} tickFormatter={v => `₱${v.toLocaleString('en')}`} />
-                  <YAxis type="category" dataKey="category" tick={{ fontSize: 11, fill: chartTick }} width={110} />
+                  <YAxis type="category" dataKey="category" tick={{ fontSize: 10, fill: chartTick }} width={90} />
                   <Tooltip formatter={(v) => [fmt(v), 'Amount']} contentStyle={tooltipStyle} />
                   <Bar dataKey="total" name="Amount" radius={[0, 4, 4, 0]}>
                     {expenseCats.map((_, i) => <Cell key={i} fill={EXPENSE_COLORS[i % EXPENSE_COLORS.length]} />)}
