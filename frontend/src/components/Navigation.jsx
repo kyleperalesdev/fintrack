@@ -22,6 +22,7 @@ export default function Navigation() {
 
   useEffect(() => {
     const handleClick = (e) => {
+      if (window.innerWidth < 768) return // mobile closing handled by backdrop
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setSetupOpen(false)
       }
@@ -119,31 +120,39 @@ export default function Navigation() {
         </div>
       </nav>
 
+      {/* Mobile Setup slide-up panel — separate fixed element so hit-testing isn't clipped by the tab bar */}
+      {setupOpen && (
+        <div className="md:hidden fixed bottom-14 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+          {setupLinks.map(({ to, label, icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              onClick={() => setSetupOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`
+              }
+            >
+              <span className="text-xl">{icon}</span>
+              {label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+
+      {/* Backdrop */}
+      {setupOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40"
+          onClick={() => setSetupOpen(false)}
+        />
+      )}
+
       {/* Mobile bottom tab bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
-        {/* Setup slide-up panel */}
-        {setupOpen && (
-          <div className="absolute bottom-full left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
-            {setupLinks.map(({ to, label, icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                onClick={() => setSetupOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`
-                }
-              >
-                <span className="text-xl">{icon}</span>
-                {label}
-              </NavLink>
-            ))}
-          </div>
-        )}
-
         <div className="flex">
           {mainLinks.map(({ to, shortLabel, icon }) => (
             <NavLink
@@ -175,14 +184,6 @@ export default function Navigation() {
           </button>
         </div>
       </div>
-
-      {/* Backdrop to close mobile setup panel */}
-      {setupOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-40"
-          onClick={() => setSetupOpen(false)}
-        />
-      )}
     </>
   )
 }
