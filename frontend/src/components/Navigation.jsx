@@ -11,6 +11,7 @@ const mainLinks = [
 
 const setupLinks = [
   { to: '/import',     label: 'Import',     icon: '📥' },
+  { to: '/export',     label: 'Export',     icon: '📤' },
   { to: '/categories', label: 'Categories', icon: '🏷️' },
 ]
 
