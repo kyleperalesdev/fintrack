@@ -7,6 +7,7 @@ const links = [
   { to: '/history',      label: 'History',     shortLabel: 'History', icon: '📜' },
   { to: '/observations', label: 'Observations',shortLabel: 'Observe', icon: '🔍' },
   { to: '/import',       label: 'Import',      shortLabel: 'Import',  icon: '📥' },
+  { to: '/categories',   label: 'Categories',  shortLabel: 'Tags',    icon: '🏷️' },
 ]
 
 export default function Navigation() {

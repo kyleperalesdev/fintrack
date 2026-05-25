@@ -6,13 +6,12 @@ const db = require('../db');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-const DEFAULT_CATEGORIES = {
-  income: ['Salary', 'Bonus', 'Freelance', 'Other income'],
-  expense: [
-    'Housing & utilities', 'Groceries', 'Dining out', 'Transportation',
-    'Healthcare', 'Personal & lifestyle', 'Baby & family', 'Subscriptions', 'Miscellaneous',
-  ],
-};
+function getDefaultCategories() {
+  const rows = db.prepare('SELECT type, name FROM categories ORDER BY type, id').all();
+  const result = { income: [], expense: [] };
+  rows.forEach(r => result[r.type].push(r.name));
+  return result;
+}
 
 function normalizeDate(raw) {
   if (!raw) return null;
@@ -131,6 +130,8 @@ router.post('/parse', upload.single('file'), (req, res) => {
   }
 
   // --- Build category mapping suggestions ---
+  const DEFAULT_CATEGORIES = getDefaultCategories();
+
   const allCsvCategories = {
     income: [...new Set(csvIncomeCategories)],
     expense: [...new Set(csvExpenseCategories)],
@@ -190,6 +191,10 @@ router.post('/confirm', (req, res) => {
     'INSERT INTO entries (date, type, category, description, amount) VALUES (?, ?, ?, ?, ?)'
   );
 
+  const insertCatStmt = db.prepare(
+    'INSERT OR IGNORE INTO categories (name, type) VALUES (?, ?)'
+  );
+
   const dupCheck = db.prepare(
     'SELECT id FROM entries WHERE date=? AND type=? AND category=? AND amount=? LIMIT 1'
   );
@@ -197,6 +202,7 @@ router.post('/confirm', (req, res) => {
   const bulkInsert = db.transaction((rows) => {
     for (const tx of rows) {
       const mappedCategory = mappings[`${tx.type}::${tx.category}`] || tx.category;
+      insertCatStmt.run(mappedCategory, tx.type);
       try {
         const dup = dupCheck.get(tx.date, tx.type, mappedCategory, tx.amount);
         if (dup) {

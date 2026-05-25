@@ -6,6 +6,7 @@ import Breakdown from './pages/Breakdown'
 import History from './pages/History'
 import Observations from './pages/Observations'
 import Import from './pages/Import'
+import Categories from './pages/Categories'
 
 function AppShell() {
   const { dark } = useDark()
@@ -21,6 +22,7 @@ function AppShell() {
             <Route path="/history" element={<History />} />
             <Route path="/observations" element={<Observations />} />
             <Route path="/import" element={<Import />} />
+            <Route path="/categories" element={<Categories />} />
           </Routes>
         </main>
       </div>

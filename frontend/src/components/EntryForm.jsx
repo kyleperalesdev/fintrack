@@ -1,10 +1,5 @@
-import { useState } from 'react'
-
-const INCOME_CATEGORIES = ['Salary', 'Bonus', 'Freelance', 'Other income']
-const EXPENSE_CATEGORIES = [
-  'Housing & utilities', 'Groceries', 'Dining out', 'Transportation',
-  'Healthcare', 'Personal & lifestyle', 'Baby & family', 'Subscriptions', 'Miscellaneous',
-]
+import { useState, useEffect } from 'react'
+import { getCategories } from '../api'
 
 const inputCls = 'w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:[color-scheme:dark]'
 
@@ -16,8 +11,21 @@ export default function EntryForm({ onSubmit, initial = {}, onCancel }) {
     description: initial.description || '',
     amount: initial.amount || '',
   })
+  const [categoryMap, setCategoryMap] = useState({ income: [], expense: [] })
 
-  const categories = form.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+  useEffect(() => {
+    getCategories().then(data => {
+      const map = { income: [], expense: [] }
+      data.forEach(c => map[c.type].push(c.name))
+      setCategoryMap(map)
+    })
+  }, [])
+
+  const baseCategories = categoryMap[form.type] || []
+  // Preserve initial category value even if it's not in the current list (e.g. from an old import)
+  const categories = initial.category && !baseCategories.includes(initial.category)
+    ? [...baseCategories, initial.category]
+    : baseCategories
 
   const set = (k, v) =>
     setForm(f => ({ ...f, [k]: v, ...(k === 'type' ? { category: '' } : {}) }))
