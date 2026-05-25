@@ -1,17 +1,39 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
 import { useDark } from '../ThemeContext'
 
-const links = [
+const mainLinks = [
   { to: '/daily',        label: 'Daily',       shortLabel: 'Daily',   icon: '📅' },
   { to: '/breakdown',    label: 'Breakdown',   shortLabel: 'Break',   icon: '📊' },
   { to: '/history',      label: 'History',     shortLabel: 'History', icon: '📜' },
   { to: '/observations', label: 'Observations',shortLabel: 'Observe', icon: '🔍' },
-  { to: '/import',       label: 'Import',      shortLabel: 'Import',  icon: '📥' },
-  { to: '/categories',   label: 'Categories',  shortLabel: 'Tags',    icon: '🏷️' },
+]
+
+const setupLinks = [
+  { to: '/import',     label: 'Import',     icon: '📥' },
+  { to: '/categories', label: 'Categories', icon: '🏷️' },
 ]
 
 export default function Navigation() {
   const { dark, toggle } = useDark()
+  const location = useLocation()
+  const [setupOpen, setSetupOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setSetupOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  useEffect(() => { setSetupOpen(false) }, [location.pathname])
+
+  const isSetupActive = setupLinks.some(l => location.pathname === l.to)
+
   return (
     <>
       {/* Top bar */}
@@ -19,9 +41,9 @@ export default function Navigation() {
         <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-14">
           <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">💰 FinTrack</span>
 
-          {/* Desktop nav — hidden below md */}
+          {/* Desktop nav */}
           <div className="hidden md:flex gap-1 items-center">
-            {links.map(({ to, label, icon }) => (
+            {mainLinks.map(({ to, label, icon }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -36,6 +58,47 @@ export default function Navigation() {
                 {icon} {label}
               </NavLink>
             ))}
+
+            {/* Setup dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setSetupOpen(o => !o)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+                  isSetupActive || setupOpen
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                ⚙️ Setup
+                <svg
+                  className={`w-3 h-3 transition-transform ${setupOpen ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {setupOpen && (
+                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-50">
+                  {setupLinks.map(({ to, label, icon }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
+                          isActive
+                            ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`
+                      }
+                    >
+                      {icon} {label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button
               onClick={toggle}
               className="ml-2 p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -56,10 +119,33 @@ export default function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile bottom tab bar — hidden at md and above */}
+      {/* Mobile bottom tab bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+        {/* Setup slide-up panel */}
+        {setupOpen && (
+          <div className="absolute bottom-full left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+            {setupLinks.map(({ to, label, icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                onClick={() => setSetupOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`
+                }
+              >
+                <span className="text-xl">{icon}</span>
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        )}
+
         <div className="flex">
-          {links.map(({ to, shortLabel, icon }) => (
+          {mainLinks.map(({ to, shortLabel, icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -75,8 +161,28 @@ export default function Navigation() {
               <span className="text-[10px] font-medium">{shortLabel}</span>
             </NavLink>
           ))}
+
+          <button
+            onClick={() => setSetupOpen(o => !o)}
+            className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
+              isSetupActive || setupOpen
+                ? 'text-indigo-600 dark:text-indigo-400'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            <span className="text-xl leading-none">⚙️</span>
+            <span className="text-[10px] font-medium">Setup</span>
+          </button>
         </div>
       </div>
+
+      {/* Backdrop to close mobile setup panel */}
+      {setupOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40"
+          onClick={() => setSetupOpen(false)}
+        />
+      )}
     </>
   )
 }
