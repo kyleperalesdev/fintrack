@@ -18,7 +18,24 @@ router.get('/', (req, res) => {
      ORDER BY date ASC, created_at ASC`
   ).all(...params);
 
+  const categories = db.prepare(
+    `SELECT name, type FROM categories ORDER BY type, id`
+  ).all();
+  const incomeCategories = categories.filter(c => c.type === 'income').map(c => c.name);
+  const expenseCategories = categories.filter(c => c.type === 'expense').map(c => c.name);
+  const setupRows = Math.max(incomeCategories.length, expenseCategories.length);
+  const setupData = [
+    ['Income', 'Expense'],
+    ...Array.from({ length: setupRows }, (_, i) => [
+      incomeCategories[i] || '',
+      expenseCategories[i] || '',
+    ]),
+  ];
+  const setupWs = XLSX.utils.aoa_to_sheet(setupData);
+  setupWs['!cols'] = [{ wch: 24 }, { wch: 24 }];
+
   const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, setupWs, 'Setup');
 
   const wsData = [
     ['Date', 'Type', 'Category', 'Description', 'Amount'],
