@@ -23,9 +23,10 @@ export default function EntryForm({ onSubmit, initial = {}, onCancel }) {
 
   const baseCategories = categoryMap[form.type] || []
   // Preserve initial category value even if it's not in the current list (e.g. from an old import)
-  const categories = initial.category && !baseCategories.includes(initial.category)
+  const categories = (initial.category && !baseCategories.includes(initial.category)
     ? [...baseCategories, initial.category]
     : baseCategories
+  ).sort((a, b) => a.localeCompare(b))
 
   const set = (k, v) =>
     setForm(f => ({ ...f, [k]: v, ...(k === 'type' ? { category: '' } : {}) }))

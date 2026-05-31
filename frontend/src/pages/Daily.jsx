@@ -28,7 +28,7 @@ export default function Daily() {
   const net     = income - expense
 
   const handleCreate = async (data) => {
-    await createEntry({ ...data, date })
+    await createEntry(data)
     setShowForm(false)
     load()
   }
